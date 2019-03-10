@@ -3,7 +3,7 @@
     <v-container fluid class="mt-5"  >
         <v-layout wrap align-center justify-center row fill-height class="pa-3" >
             
-            <v-flex xs12 md2 lg2 class="pa-3 hidden-sm-and-down">
+            <v-flex xs12 md2 lg2 class="pa-3 hidden-sm-and-down" v-on="callOnLoad()">
                 <v-img
                     width="100%"
                     :src="require('@/assets/img/svg/getting-started_bg.svg')"
@@ -20,8 +20,9 @@
                         </v-layout>    
                 </v-img>
             </v-flex>
-            <v-flex xs12 md6 lg4 v-if=" status ==false">
-                <v-btn color="#f1f8e9" @click="auth"  >
+            <v-flex xs12 md6 lg4 v-if=" status ==false" layout-align="center center"
+>
+                <v-btn color="#f1f8e9" @click="auth"  style="margin-left:60px;">
                   <v-img
                     width="20px"
                     :src="require('@/assets/img/googlelogo.png')"
@@ -40,14 +41,14 @@
             <v-text-field
             v-model="form.name"
             maxlength=40
-            
+            :rules="[v => !!v || 'Item is required']"
             label="Full Name"
             required
             ></v-text-field>
 
             
 
-            <v-radio-group v-model="radioGroup" required>
+            <v-radio-group v-model="radioGroup" :rules="[v => !!v || 'Item is required']" required>
       <v-radio
         
         :label="`Male`"
@@ -73,12 +74,14 @@
              <v-text-field
             v-model="form.city"
             maxlength=25
+            :rules="[v => !!v || 'Item is required']"
             required
             label="Current City"
             ></v-text-field>
 
              <v-text-field
             v-model="form.experience"
+            :rules="[v => !!v || 'Item is required']"
             required
             type="number"
             label="Years of Experience"
@@ -87,6 +90,7 @@
              <v-text-field
             v-model="form.whyattend"
           required
+          :rules="[v => !!v || 'Item is required']"
             maxlength=150
             label="Why do you want to attend?"
             ></v-text-field>
@@ -97,35 +101,49 @@
             v-model="form.github"
             maxlength=50
           required
+          :rules="[v => !!v || 'Item is required']"
             label="Github"
             ></v-text-field>
              <v-text-field
             v-model="form.twitter"
+            :rules="[v => !!v || 'Item is required']"
             required
             maxlength=50
             label="Twitter"
             ></v-text-field>
              <v-text-field
             v-model="form.stackoverflow"
+            :rules="[v => !!v || 'Item is required']"
            required
             maxlength=50
             label="Stackoverflow"
             ></v-text-field>
              <v-text-field
             v-model="form.linkedin"
+            :rules="[v => !!v || 'Item is required']"
             maxlength=50
             required
             label="Linkedin"
             ></v-text-field>
 
             
-
+           
+            
             <v-btn
             
             color="success"
             @click="checkForm"
             >
             Register
+            </v-btn>
+             <br>
+            
+            <v-btn
+            color="red"
+            @click="signOut"
+            style="color:white;"
+            >Sign Out
+            
             </v-btn>
 
            
@@ -200,9 +218,34 @@ export default {
     mounted(){
         this.show = true
     },
-    methods:{ 
-      changeStatus(){
-      this.$store.commit('changeStatus');
+    methods:{ signOut()
+    {
+      Firebase.auth().signOut().then(function() {
+  localStorage.removeItem('wtmUser');
+  window.location.reload(true);
+}).catch(function(error) {
+  console.log(error);
+});
+    },
+    callOnLoad()
+    {
+      
+      if(localStorage.getItem("wtmUser") === null)
+      {
+        this.changeStatusToFalse();
+      }
+      else
+      {
+        this.changeStatusToTrue();
+        this.form.email=localStorage.getItem("wtmUser");
+        
+      }
+    },
+      changeStatusToTrue(){
+      this.$store.commit('changeStatusToTrue');
+    },
+    changeStatusToFalse(){
+      this.$store.commit('changeStatusToFalse');
     },
       
         getImgUrl(pic) {
@@ -219,7 +262,8 @@ export default {
  
    
   currentUser = result.user.email;
-  console.log("Logged in as: "+currentUser);
+  localStorage.setItem('wtmUser', currentUser);
+  console.log("Logged in as: "+currentUser);  
   done=true;
 
 }).catch(function(error) {
@@ -235,9 +279,11 @@ export default {
   await participantsRef.orderByChild("email").equalTo(currentUser).once("value",snapshot => {
     if (snapshot.exists()){
       alert("You have already registered!");
+      localStorage.setItem('registered',true)
     }
     else{
-      this.$store.commit('changeStatus');
+      this.$store.commit('changeStatusToTrue');
+      localStorage.setItem('registered',false)
   this.form.email=currentUser;
     }
 });
@@ -289,10 +335,10 @@ export default {
        if(re.test(String(this.form.email).toLowerCase()))
        {
      
-         var tw = new RegExp("https://www.twitter.com");
-         var gt = new RegExp("https://www.github.com");
-         var lin = new RegExp("https://www.linkedin.com");
-         var st=new RegExp("https://www.stackoverflow.com");
+         var tw = new RegExp("twitter.com");
+         var gt = new RegExp("github.com");
+         var lin = new RegExp("linkedin.com");
+         var st=new RegExp("stackoverflow.com");
       
         
          if(st.test(this.form.stackoverflow)

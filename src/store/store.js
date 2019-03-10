@@ -7,12 +7,15 @@ export const store = new Vuex.Store({
     state: {
       drawer:false,
       vname:"asdasd",
-      loggedin:false
+      loggedin:"",
+     
     },
     mutations: {
         setDrawer: (state, payload)=>(state.drawer = payload),
         toggleDrawer: state=>(state.drawer = !state.drawer),
-        changeStatus:state=>(state.loggedin=true)
+        changeStatusToTrue:state=>(state.loggedin=true),
+        changeStatusToFalse:state=>(state.loggedin=false),
+       
         
     }
 })
