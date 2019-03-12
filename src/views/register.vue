@@ -27,7 +27,7 @@
                     width="20px"
                     :src="require('@/assets/img/googlelogo.png')"
                     :lazy-src="require('@/assets/img/googlelogo.png')"></v-img>
-                   &nbsp;&nbsp;Sign In</v-btn>
+                   &nbsp;&nbsp;Sign In Here</v-btn>
             </v-flex>
             <v-flex xs12 md6 lg4  v-if="status==true">
                 <span class="pa-2 google-font" style="border-radius:8px;background-color:#FFEBEE;color:#B71C1C;font-size:150%" >Register</span><br>
