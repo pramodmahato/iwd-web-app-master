@@ -178,6 +178,7 @@ var provider = new Firebase.auth.GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/userinfo.email');
 Firebase.auth().languageCode = 'en';
 
+
 export default {
     
     components:{
@@ -215,32 +216,45 @@ export default {
         }
         
     },
+    created(){
+        var st;
+         Firebase.auth().onAuthStateChanged(function(user) {
+       
+  if (user) {
+    console.log(user.email);
+    st=true;
+  } 
+  else{
+    st=false;
+  }
+});
+if(st==true)
+{
+  this.$store.commit('changeStatusToTrue');
+}
+else{
+  this.$store.commit('changeStatusToFalse');
+}
+    },
     mounted(){
-        this.show = true
+        this.show = true;
+
     },
     methods:{ signOut()
     {
       Firebase.auth().signOut().then(function() {
-  localStorage.removeItem('wtmUser');
-  window.location.reload(true);
+  
+  
 }).catch(function(error) {
   console.log(error);
 });
     },
     callOnLoad()
     {
-      
-      if(localStorage.getItem("wtmUser") === null)
-      {
-        this.changeStatusToFalse();
-      }
-      else
-      {
-        this.changeStatusToTrue();
-        this.form.email=localStorage.getItem("wtmUser");
-        
-      }
-    },
+     
+     
+  
+  },
       changeStatusToTrue(){
       this.$store.commit('changeStatusToTrue');
     },
@@ -263,7 +277,7 @@ export default {
  
    
   currentUser = result.user.email;
-  localStorage.setItem('wtmUser', currentUser);
+  
   console.log("Logged in as: "+currentUser);  
   done=true;
 
